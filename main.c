@@ -7,6 +7,8 @@ typedef struct Room {
     struct Room *south;
     struct Room *east;
     struct Room *west;
+    struct Room *up;
+    struct Room *down;
 
 } Room;
 
@@ -17,6 +19,8 @@ Room *CreateRoom(char *description) {
     room->south = NULL;
     room->east = NULL;
     room->west = NULL;
+    room->up = NULL;
+    room->down = NULL;
     return room;
 }
 
