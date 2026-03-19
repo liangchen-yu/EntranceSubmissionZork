@@ -39,6 +39,12 @@ void PrintRoom(Room *room) {
     if (room->west) {
         printf("west\n");
     }
+    if (room->up) {
+        printf("up\n");
+    }
+    if (room->down) {
+        printf("down\n");
+    }
 }
 
 int main(void) {
