@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct Room {
     char *description;
@@ -9,6 +10,15 @@ typedef struct Room {
 
 } Room;
 
+Room *CreateRoom(char *description) {
+    Room *room = (Room *)malloc(sizeof(Room));
+    room->description = description;
+    room->north = NULL;
+    room->south = NULL;
+    room->east = NULL;
+    room->west = NULL;
+    return room;
+}
 int main(void) {
     printf("Zork Text Based Game\n");
     return 0;
