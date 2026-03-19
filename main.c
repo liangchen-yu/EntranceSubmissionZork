@@ -19,7 +19,28 @@ Room *CreateRoom(char *description) {
     room->west = NULL;
     return room;
 }
+
+void PrintRoom(Room *room) {
+    printf("Room description: %s\n", room->description);
+    printf("Exits: ");
+    if (room->north) {
+        printf("north\n");
+    }
+    if (room->south) {
+        printf("south\n");
+    }
+    if (room->east) {
+        printf("east\n");
+    }
+    if (room->west) {
+        printf("west\n");
+    }
+}
+
 int main(void) {
     printf("Zork Text Based Game\n");
+    Room *basement = CreateRoom("basement");
+    PrintRoom(basement);
+
     return 0;
 }
