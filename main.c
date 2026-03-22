@@ -12,6 +12,13 @@ typedef struct Room {
 
 } Room;
 
+typedef struct {
+    char *name;
+    Room *currentRoom;
+} Player;
+
+Player *player;
+
 Room *basement, *hallway, *garage, *office, *bathroom, *bedroom, *stairs, *upstairs, *attic, *exitDoor;
 
 Room *CreateRoom(char *description) {
@@ -81,9 +88,18 @@ void CreateRooms(void) {
     upstairs->west = office;
     office->east = upstairs;
 }
+
+Player *CreatePlayer(char *name, Room *start) {
+    Player *p = (Player *)malloc(sizeof(Player));
+    p->name = name;
+    p->currentRoom = start;
+    return p;
+}
+
 int main(void) {
     printf("Zork Text Based Game\n");
     CreateRooms();
-    PrintRoom(basement);
+    player = CreatePlayer("Player", basement);
+    PrintRoom(player->currentRoom);
     return 0;
 }
