@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Room {
     char *description;
@@ -17,9 +18,18 @@ typedef struct {
     Room *currentRoom;
 } Player;
 
+typedef struct {
+    char *commandWord;
+    char *secondWord;
+} Command;
+
 Player *player;
 
 Room *basement, *hallway, *garage, *office, *bathroom, *bedroom, *stairs, *upstairs, *attic, *exitDoor;
+
+char input[500];
+char word1[100];
+char word2[100];
 
 Room *CreateRoom(char *description) {
     Room *room = (Room *)malloc(sizeof(Room));
@@ -54,6 +64,13 @@ void PrintRoom(Room *room) {
     if (room->down) {
         printf("down\n");
     }
+}
+
+void PrintWelcome(void) {
+    printf("\nWelcome to Escape It!\n");
+    printf("You awaken in darkness. Your head throbs. You must escape.\n");
+    printf("Type 'help' if you need help.\n\n"); //implementing this later
+    PrintRoom(player->currentRoom);
 }
 
 void CreateRooms(void) {
@@ -96,10 +113,87 @@ Player *CreatePlayer(char *name, Room *start) {
     return p;
 }
 
+Command GetCommand(void) {
+    Command cmd;
+    cmd.commandWord = NULL;
+    cmd.secondWord = NULL;
+
+    printf("> ");
+    fgets(input, sizeof(input), stdin);
+
+    input[strcspn(input, "\n")] = 0;
+
+    word1[0] = '\0';
+    word2[0] = '\0';
+
+    sscanf(input, "%s %s", word1, word2);//fixed
+
+    if (strlen(word1) > 0) cmd.commandWord = word1;
+    if (strlen(word2) > 0) cmd.secondWord = word2;
+
+    return cmd;
+}
+
+void GoRoom(Command cmd) {
+    if (cmd.secondWord == NULL) {
+        printf("Go where?\n");
+        return;
+    }
+
+    Room *next = NULL;
+
+    if (strcmp(cmd.secondWord, "north") == 0) next = player->currentRoom->north;
+    else if (strcmp(cmd.secondWord, "south") == 0) next = player->currentRoom->south;
+    else if (strcmp(cmd.secondWord, "east") == 0) next = player->currentRoom->east;
+    else if (strcmp(cmd.secondWord, "west") == 0) next = player->currentRoom->west;
+    else if (strcmp(cmd.secondWord, "up") == 0) next = player->currentRoom->up;
+    else if (strcmp(cmd.secondWord, "down") == 0) next = player->currentRoom->down;
+
+    if (next == NULL) {
+        printf("There is no door!\n");
+    } else {
+        player->currentRoom = next;
+        PrintRoom(player->currentRoom);
+    }
+}
+
+int ProcessCommand(Command cmd) {
+
+    if (cmd.commandWord == NULL) {
+        printf("I don't understand...\n");
+        return 0;
+    }
+
+    if (strcmp(cmd.commandWord, "go") == 0) {
+        GoRoom(cmd);
+    } else if (strcmp(cmd.commandWord, "look") == 0) {
+        PrintRoom(player->currentRoom);
+
+    } else if (strcmp(cmd.commandWord, "help") == 0) {
+        printf("Commands: go, look, help, quit\n");
+    } else if (strcmp(cmd.commandWord, "quit") == 0) {
+        return 1;
+    } else {
+        printf("Unknown command.\n");
+    }
+
+    return 0;
+
+}
+
+void Play(void) {
+    PrintWelcome();
+
+    int finished = 0;
+    while (!finished) {
+        Command cmd = GetCommand();
+        finished = ProcessCommand(cmd);
+    }
+    printf("Thank you for playing. Goodbye.\n");
+}
 int main(void) {
-    printf("Zork Text Based Game\n");
     CreateRooms();
     player = CreatePlayer("Player", basement);
-    PrintRoom(player->currentRoom);
+    Play();
     return 0;
 }
