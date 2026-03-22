@@ -12,6 +12,8 @@ typedef struct Room {
 
 } Room;
 
+Room *basement, *hallway, *garage, *office, *bathroom, *bedroom, *stairs, *upstairs, *attic, *exitDoor;
+
 Room *CreateRoom(char *description) {
     Room *room = (Room *)malloc(sizeof(Room));
     room->description = description;
@@ -47,10 +49,41 @@ void PrintRoom(Room *room) {
     }
 }
 
+void CreateRooms(void) {
+    // Create all rooms
+    basement = CreateRoom("In the cold, damp basement. Water drips from the rusty pipes overhead");
+    hallway = CreateRoom("In the narrow, dark hallway");
+    garage = CreateRoom("In the dusty, old garage");
+    office = CreateRoom("In the messy, cluttered office");
+    bathroom = CreateRoom("in the grimy bathroom. The mirror is cracked and the faucet drips steadily");
+    bedroom = CreateRoom("In the bedroom. The bed sheets are stained and moth-eaten");
+    stairs = CreateRoom("on the creaky wooden stairs. Each step groans under your weight");
+    upstairs = CreateRoom("upstairs in the dim corridor. Moonlight filters through a broken window");
+    attic = CreateRoom("in the dark, suffocating attic. Cobwebs hang from every corner");
+    exitDoor = CreateRoom("at the exit");
+
+    // Link rooms
+    basement->north = hallway;
+    hallway->south = basement;
+    hallway->east = stairs;
+    hallway->west = garage;
+    hallway->north = exitDoor;
+    garage->east = hallway;
+    stairs->west = hallway;
+    stairs->up = upstairs;
+    upstairs->down = stairs;
+    upstairs->east = bedroom;
+    bedroom->west = upstairs;
+    bedroom->north = bathroom;
+    bathroom->south = bedroom;
+    upstairs->up = attic;
+    attic->down = upstairs;
+    upstairs->west = office;
+    office->east = upstairs;
+}
 int main(void) {
     printf("Zork Text Based Game\n");
-    Room *basement = CreateRoom("basement");
+    CreateRooms();
     PrintRoom(basement);
-
     return 0;
 }
