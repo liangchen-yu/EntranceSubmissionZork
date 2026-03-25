@@ -8,6 +8,13 @@ typedef struct {
     char *description;
 } Item;
 
+typedef struct {
+    char *name;
+    char *description;
+    int searched;
+    Item *hiddenItem;
+} Furniture;
+
 typedef struct Room {
     char *description;
     struct Room *north;
@@ -18,6 +25,8 @@ typedef struct Room {
     struct Room *down;
     Item *items[10];
     int itemCount;
+    Furniture *furniture[10];
+    int furnitureCount;
 
 } Room;
 
@@ -51,6 +60,7 @@ Room *CreateRoom(char *description) {
     room->up = NULL;
     room->down = NULL;
     room->itemCount = 0;
+    room->furnitureCount = 0;
     return room;
 }
 
@@ -137,6 +147,14 @@ void PrintRoom(Room *room) {
         printf("\n");
     }
 
+    if (room->furnitureCount > 0) {
+        printf("You see: ");
+        for (int i = 0; i < room->furnitureCount; i++) {
+            printf("%s ", room->furniture[i]->name);
+        }
+        printf("\n");
+    }
+
     printf("Exits: \n");
     if (room->north) {
         printf("north\n");
@@ -163,6 +181,21 @@ void PrintWelcome(void) {
     printf("You awaken in darkness. Your head throbs. You must escape.\n");
     printf("Type 'help' if you need help.\n\n"); //implementing this later
     PrintRoom(player->currentRoom);
+}
+
+Furniture *CreateFurniture(char *name, char *description) {
+    Furniture *furniture = (Furniture *)malloc(sizeof(Furniture));
+    furniture->name = name;
+    furniture->description = description;
+    furniture->searched = 0;
+    furniture->hiddenItem = NULL;
+    return furniture;
+}
+
+void AddFurnitureToRoom(Room *room, Furniture *furniture) {
+    int count = room->furnitureCount;
+    room->furniture[count] = furniture;
+    room->furnitureCount = room->furnitureCount + 1;
 }
 
 void CreateRooms(void) {
@@ -196,6 +229,13 @@ void CreateRooms(void) {
     attic->down = upstairs;
     upstairs->west = office;
     office->east = upstairs;
+
+    Furniture *drawer = CreateFurniture("drawer", "a rusted drawer attached to the desk");
+    drawer->hiddenItem = CreateItem("notebook", "a weathered leather notebook with a code inside");
+    AddFurnitureToRoom(office, drawer);
+    Furniture *closet = CreateFurniture("closet", "a tall, dusty wooden closet");
+    closet->hiddenItem = CreateItem("key", "a rusty old key");
+    AddFurnitureToRoom(attic, closet);
     PlaceItemsRandomly();
 }
 
@@ -228,6 +268,15 @@ Command GetCommand(void) {
     return cmd;
 }
 
+int HasItem(char *itemName) {
+    for (int i = 0; i < player->inventoryCount; i++) {
+        if (strcmp(player->inventory[i]->name, itemName) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void GoRoom(Command cmd) {
     if (cmd.secondWord == NULL) {
         printf("Go where?\n");
@@ -251,9 +300,17 @@ void GoRoom(Command cmd) {
 
     if (next == NULL) {
         printf("There is no door!\n");
-    } else {
+    } else if (next == attic && HasItem("rope") == 0) {
+        printf("The attic trapdoor is locked. You need a rope to climb up.\n");
+    } else if (next == exitDoor && HasItem("key") == 0) {
+        printf("The exit door is locked. You need a key.\n");
+    } else{
         player->currentRoom = next;
         PrintRoom(player->currentRoom);
+        if (player->currentRoom == exitDoor) {
+            printf("You've beaten the game!!, ");
+            printf("You escaped the house!\n");
+        }
     }
 }
 
@@ -332,6 +389,39 @@ void DropItem(Command cmd) {
     printf("You dropped the %s.\n", item->name);
 }
 
+void SearchFurniture(Command cmd) {
+    if (cmd.secondWord == NULL) {
+        printf("Search what?\n");
+        return;
+    }
+    Room *room = player->currentRoom;
+    for (int i = 0; i < room->furnitureCount; i++) {
+        if (strcmp(room->furniture[i]->name, cmd.secondWord) == 0) {
+            Furniture *furniture = room->furniture[i];
+            printf("You search the %s. %s\n", furniture->name, furniture->description);
+
+            // Check if already searched
+            if (furniture->searched == 1) {
+                printf("You already searched this.\n");
+                return;
+            }
+
+            // Check for hidden item
+            if (furniture->hiddenItem != NULL) {
+                printf("You found a %s!\n", furniture->hiddenItem->name);
+                AddItemToRoom(room, furniture->hiddenItem);
+                furniture->hiddenItem = NULL;
+            } else {
+                printf("You find nothing useful.\n");
+            }
+
+            furniture->searched = 1;
+            return;
+        }
+    }
+
+    printf("There is no %s here.\n", cmd.secondWord);
+}
 int ProcessCommand(Command cmd) {
 
     if (cmd.commandWord == NULL) {
@@ -343,21 +433,65 @@ int ProcessCommand(Command cmd) {
     } else if (strcmp(cmd.commandWord, "look") == 0) {
         PrintRoom(player->currentRoom);
     } else if (strcmp(cmd.commandWord, "help") == 0) {
-        printf("Commands: go, look, take, drop, inventory, help, quit\n");
+        printf("Commands: go, look, take, drop, inventory, search, help, quit\n");
     } else if (strcmp(cmd.commandWord, "take") == 0) {
         TakeItem(cmd);
     } else if (strcmp(cmd.commandWord, "drop") == 0) {
         DropItem(cmd);
     } else if (strcmp(cmd.commandWord, "inventory") == 0) {
         ShowInventory();
+    } else if (strcmp(cmd.commandWord, "search") == 0) {
+        SearchFurniture(cmd);
     } else if (strcmp(cmd.commandWord, "quit") == 0) {
         return 1;
+    } else if (strcmp(cmd.commandWord, "debug") == 0) {
+        // Give all items
+        player->inventory[player->inventoryCount] = CreateItem("rope", "debug rope");
+        player->inventoryCount = player->inventoryCount + 1;
+        player->inventory[player->inventoryCount] = CreateItem("key", "debug key");
+        player->inventoryCount = player->inventoryCount + 1;
+        printf("DEBUG: Added rope and key to inventory.\n");
+    } else if (strcmp(cmd.commandWord, "teleport") == 0) {
+        if (cmd.secondWord == NULL) {
+            printf("teleport where? (basement, hallway, garage, office, bathroom, bedroom, stairs, upstairs, attic, exit)\n");
+        } else if (strcmp(cmd.secondWord, "basement") == 0) {
+            player->currentRoom = basement;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "hallway") == 0) {
+            player->currentRoom = hallway;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "garage") == 0) {
+            player->currentRoom = garage;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "office") == 0) {
+            player->currentRoom = office;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "bathroom") == 0) {
+            player->currentRoom = bathroom;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "bedroom") == 0) {
+            player->currentRoom = bedroom;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "stairs") == 0) {
+            player->currentRoom = stairs;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "upstairs") == 0) {
+            player->currentRoom = upstairs;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "attic") == 0) {
+            player->currentRoom = attic;
+            PrintRoom(player->currentRoom);
+        } else if (strcmp(cmd.secondWord, "exit") == 0) {
+            player->currentRoom = exitDoor;
+            PrintRoom(player->currentRoom);
+        }else {
+            printf("Unkown room\n");
+        }
     } else {
-        printf("Unknown command.\n");
+            printf("Unknown command.\n");
+
     }
-
     return 0;
-
 }
 
 void Play(void) {
