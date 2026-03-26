@@ -137,19 +137,19 @@ void PlaceItemsRandomly(void) {
 
     // put note somewhere
     if (random3 == 0) {
-        AddItemToRoom(basement, CreateItem("note", "a torn piece of paper"));
+        AddItemToRoom(basement, CreateItem("note", "a torn piece of paper, this is useless I should keep looking around the house"));
     } else if (random3 == 1) {
-        AddItemToRoom(hallway, CreateItem("note", "a torn piece of paper"));
+        AddItemToRoom(hallway, CreateItem("note", "a torn piece of paper, this is useless I should keep looking around the house"));
     } else if (random3 == 2) {
-        AddItemToRoom(garage, CreateItem("note", "a torn piece of paper"));
+        AddItemToRoom(garage, CreateItem("note", "a torn piece of paper, this is useless I should keep looking around the house"));
     } else if (random3 == 3) {
-        AddItemToRoom(bathroom, CreateItem("note", "a torn piece of paper"));
+        AddItemToRoom(bathroom, CreateItem("note", "a torn piece of paper, this is useless I should keep looking around the house"));
     } else if (random3 == 4) {
-        AddItemToRoom(bedroom, CreateItem("note", "a torn piece of paper"));
+        AddItemToRoom(bedroom, CreateItem("note", "a torn piece of paper, this is useless I should keep looking around the house"));
     } else if (random3 == 5) {
-        AddItemToRoom(stairs, CreateItem("note", "a torn piece of paper"));
+        AddItemToRoom(stairs, CreateItem("note", "a torn piece of paper, this is useless I should keep looking around the house"));
     } else {
-        AddItemToRoom(upstairs, CreateItem("note", "a torn piece of paper"));
+        AddItemToRoom(upstairs, CreateItem("note", "a torn piece of paper, this is useless I should keep looking around the house"));
     }
 }
 //Prints the room description, items, furniture, exits and NPCs
