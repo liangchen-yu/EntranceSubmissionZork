@@ -340,6 +340,7 @@ void GoRoom(Command cmd) {
         if (player->currentRoom == exitDoor) {
             printf("You've beaten the game!!, ");
             printf("You escaped the house!\n");
+            exit(0); //Quit the game.
         }
     }
 }
@@ -349,7 +350,6 @@ void TakeItem(Command cmd) {
         printf("Take what?\n");
         return;
     }
-
     Room *room = player->currentRoom;
     int foundIndex = -1;
     // Find item
@@ -432,7 +432,7 @@ void SearchFurniture(Command cmd) {
 
             // Check if already searched
             if (furniture->searched == 1) {
-                printf("You already searched this.\n");
+                printf("You already searched this\n");
                 return;
             }
             // Check for hidden item
@@ -445,7 +445,7 @@ void SearchFurniture(Command cmd) {
                 printf("You found a codebox inside!\n");
                 AddFurnitureToRoom(room, codebox);
             } else {
-                printf("You find nothing useful\n");
+                printf("You found nothing useful\n");
             }
             furniture->searched = 1;
             return;
@@ -521,7 +521,7 @@ Room *GetRoomByName(char *name) {
 void SaveGame(void) {
     FILE *file = fopen("savegame.txt", "w");
     if (file == NULL) {
-        printf("Could not save game.\n");
+        printf("Could not save game\n");
         return;
     }// Save current room
     fprintf(file, "%s\n", GetRoomName(player->currentRoom));
@@ -539,7 +539,7 @@ void SaveGame(void) {
 void LoadGame(void) {
     FILE *file = fopen("savegame.txt", "r");
     if (file == NULL) {
-        printf("No save file found.\n");
+        printf("No save file found\n");
         return;
     }
     char roomName[100];
@@ -701,7 +701,11 @@ int ProcessCommand(Command cmd) {
     } else if (strcmp(cmd.commandWord, "load") == 0) {
         LoadGame();
     } else if (strcmp(cmd.commandWord, "open") == 0) {
-        OpenCodeBox();
+        if (cmd.secondWord != NULL && strcmp(cmd.secondWord, "codebox") == 0) {
+            OpenCodeBox();
+        } else {
+            printf("Open what? Invalid\n");
+        }
     } else if (strcmp(cmd.commandWord, "read") == 0) {
         ReadItem(cmd);
     } else if (strcmp(cmd.commandWord, "map") == 0) {
@@ -719,7 +723,6 @@ void Play(void) {
         Command cmd = GetCommand();
         finished = ProcessCommand(cmd);
     }
-    printf("Thank you for playing. Goodbye.\n");
 }
 
 int main(void) {
