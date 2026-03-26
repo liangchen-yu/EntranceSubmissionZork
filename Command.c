@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "Declaration.h"
-
+//Reads user input and splits it into a command(first) word and second word
 Command GetCommand(void) {
     Command cmd;
     cmd.commandWord = NULL;

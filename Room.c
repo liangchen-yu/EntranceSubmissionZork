@@ -8,6 +8,7 @@
 #include <time.h>
 #include "Declaration.h"
 
+//Creates a new room with a description and no exits (null)
 Room *CreateRoom(char *description) {
     Room *room = (Room *)malloc(sizeof(Room));
     room->description = description;
@@ -21,12 +22,13 @@ Room *CreateRoom(char *description) {
     room->furnitureCount = 0;
     return room;
 }
+//Adds an item to a room's item list
 void AddItemToRoom(Room *room, Item *item) {
     int count = room->itemCount;
     room->items[count] = item;
     room->itemCount = room->itemCount + 1;
 }
-
+//Creates a new furniture with a name and description
 Furniture *CreateFurniture(char *name, char *description) {
     Furniture *furniture = (Furniture *)malloc(sizeof(Furniture));
     furniture->name = name;
@@ -35,13 +37,13 @@ Furniture *CreateFurniture(char *name, char *description) {
     furniture->hiddenItem = NULL;
     return furniture;
 }
-
+//Adds furniture to a room
 void AddFurnitureToRoom(Room *room, Furniture *furniture) {
     int count = room->furnitureCount;
     room->furniture[count] = furniture;
     room->furnitureCount = room->furnitureCount + 1;
 }
-
+//Creates a new NPC with name, description and dialogue
 NPC *CreateNPC(char *name, char *description, char *dialogue) {
     NPC *npc = (NPC *)malloc(sizeof(NPC));
     npc->name = name;
@@ -50,6 +52,7 @@ NPC *CreateNPC(char *name, char *description, char *dialogue) {
     npc->location = NULL;
     return npc;
 }
+//Prints the room description, items, furniture, exits and NPCs
 void PrintRoom(Room *room) {
     printf("Room description: %s\n", room->description);
 
@@ -92,6 +95,7 @@ void PrintRoom(Room *room) {
         printf("You see a %s here\n", rat->name);
     }
 }
+//Prints the room description, items, furniture, exits and NPCs
 void PlaceItemsRandomly(void) {
     int random1 = rand() % 7;
     int random2 = rand() % 7;
@@ -148,6 +152,7 @@ void PlaceItemsRandomly(void) {
         AddItemToRoom(upstairs, CreateItem("note", "a torn piece of paper"));
     }
 }
+//Prints the room description, items, furniture, exits and NPCs
 void CreateRooms(void) {
     srand(time(NULL));
     secretCode = (rand() % 900) + 100;

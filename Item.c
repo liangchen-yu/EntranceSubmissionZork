@@ -3,7 +3,7 @@
 //
 #include <stdlib.h>
 #include "Item.h"
-
+// Creates a new item with a name and description
 Item *CreateItem(char *name, char *description) {
     Item *item = (Item *)malloc(sizeof(Item));
     item->name = name;

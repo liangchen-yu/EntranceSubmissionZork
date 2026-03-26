@@ -5,13 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include "Declaration.h"
-
+//Prints starting message
 void PrintWelcome(void) {
     printf("\nWelcome to Escape It!\n");
     printf("You awaken in darkness. Your head throbs. You must escape.\n");
     printf("Type 'help' if you need help.\n\n"); //implementing this later
     PrintRoom(player->currentRoom);
 }
+//Moves the player in the direction they gave in cli
 void GoRoom(Command cmd) {
     if (cmd.secondWord == NULL) {
         printf("Go where?\n");
@@ -49,7 +50,7 @@ void GoRoom(Command cmd) {
         }
     }
 }
-
+//Takes item from current room
 void TakeItem(Command cmd) {
     if (cmd.secondWord == NULL) {
         printf("Take what?\n");
@@ -57,30 +58,30 @@ void TakeItem(Command cmd) {
     }
     Room *room = player->currentRoom;
     int foundIndex = -1;
-    // Find item
+    //Find item
     for (int i = 0; i < room->itemCount; i++) {
         if (strcmp(room->items[i]->name, cmd.secondWord) == 0) {
             foundIndex = i;
         }
     }
-    // not foundd
+    //not foundd
     if (foundIndex == -1) {
         printf("There is no %s here.\n", cmd.secondWord);
         return;
     }
-    // Get item
+    //Get item
     Item *item = room->items[foundIndex];
-    // Add to inventory
+    //Add to inventory
     player->inventory[player->inventoryCount] = item;
     player->inventoryCount = player->inventoryCount + 1;
-    // Remove
+    //Remove
     for (int i = foundIndex; i < room->itemCount - 1; i++) {
         room->items[i] = room->items[i + 1];
     }
     room->itemCount = room->itemCount - 1;
     printf("You picked up the %s.\n", item->name);
 }
-
+//Show all items currently carrying
 void ShowInventory(void) {
     if (player->inventoryCount == 0) {
         printf("Your inventory is empty.\n");
@@ -92,7 +93,7 @@ void ShowInventory(void) {
         printf("%s\n", player->inventory[i]->name);
     }
 }
-
+//Drops item from inventory into current room
 void DropItem(Command cmd) {
     if (cmd.secondWord == NULL) {
         printf("Drop what?\n");
@@ -100,20 +101,20 @@ void DropItem(Command cmd) {
     }
 
     int foundIndex = -1;
-    // Find item in inventory
+    //Find item in inventory
     for (int i = 0; i < player->inventoryCount; i++) {
         if (strcmp(player->inventory[i]->name, cmd.secondWord) == 0) {
             foundIndex = i;
         }
     }
-    // Not found
+    //Not found
     if (foundIndex == -1) {
         printf("You don't have a %s.\n", cmd.secondWord);
         return;
     }
-    // Get
+    //Get
     Item *item = player->inventory[foundIndex];
-    // Add
+    //Add
     Room *room = player->currentRoom;
     room->items[room->itemCount] = item;
     room->itemCount = room->itemCount + 1;
@@ -123,7 +124,7 @@ void DropItem(Command cmd) {
     player->inventoryCount = player->inventoryCount - 1;
     printf("You dropped the %s.\n", item->name);
 }
-
+//Searches furniture for hidden items
 void SearchFurniture(Command cmd) {
     if (cmd.secondWord == NULL) {
         printf("Search what?\n");
@@ -158,7 +159,7 @@ void SearchFurniture(Command cmd) {
     }
     printf("There is no %s here.\n", cmd.secondWord);
 }
-
+//Talks to an NPC in current room (rat)
 void InteractNPC(Command cmd) {
     if (cmd.secondWord == NULL) {
         printf("Interact with what?\n");
@@ -170,7 +171,7 @@ void InteractNPC(Command cmd) {
         printf("There is no %s here.\n", cmd.secondWord);
     }
 }
-
+//Returns the name of a room as a string
 char *GetRoomName(Room *room) {
     if (room == basement) {
         return "basement";
@@ -196,7 +197,7 @@ char *GetRoomName(Room *room) {
         return "unknown";
     }
 }
-
+//Returns a room pointer from its name
 Room *GetRoomByName(char *name) {
     if (strcmp(name, "basement") == 0) {
         return basement;
@@ -222,17 +223,17 @@ Room *GetRoomByName(char *name) {
         return basement;
     }
 }
-
+//Saves currente game progress to file
 void SaveGame(void) {
     FILE *file = fopen("savegame.txt", "w");
     if (file == NULL) {
         printf("Could not save game\n");
         return;
-    }// Save current room
+    }//Save current room
     fprintf(file, "%s\n", GetRoomName(player->currentRoom));
-    // Save inventory count
+    //Save inventory count
     fprintf(file, "%d\n", player->inventoryCount);
-    // Sav each item
+    //Sav each item
     for (int i = 0; i < player->inventoryCount; i++) {
         fprintf(file, "%s\n", player->inventory[i]->name);
     }
@@ -240,7 +241,7 @@ void SaveGame(void) {
     fclose(file);
     printf("Game saved!\n");
 }
-
+//Loads saved game progress from the file
 void LoadGame(void) {
     FILE *file = fopen("savegame.txt", "r");
     if (file == NULL) {
@@ -249,12 +250,12 @@ void LoadGame(void) {
     }
     char roomName[100];
     int itemCount;
-    // Load current room
+    //Load current room
     fscanf(file, "%s", roomName);
     player->currentRoom = GetRoomByName(roomName);
-    // Load inventory count
+    //Load inventory count
     fscanf(file, "%d", &itemCount);
-    // Load each item
+    //Load each item
     player->inventoryCount = 0;
     for (int i = 0; i < itemCount; i++) {
         char itemName[100];
@@ -269,10 +270,10 @@ void LoadGame(void) {
     printf("Game loaded!\n");
     PrintRoom(player->currentRoom);
 }
-
+//Opens the codebox if the player enters the correct code
 void OpenCodeBox(void) {
     Room *room = player->currentRoom;
-    // Check if codebox is in room
+    //Check if codebox is in room
     int found = 0;
     for (int i = 0; i < room->furnitureCount; i++) {
         if (strcmp(room->furniture[i]->name, "codebox") == 0) {
@@ -280,29 +281,29 @@ void OpenCodeBox(void) {
         }
     }
     if (found == 0) {
-        printf("There is no codebox here.\n");
+        printf("There is no codebox here\n");
         return;
     }
     if (codeboxOpened == 1) {
-        printf("The codebox is already open.\n");
+        printf("The codebox is already open\n");
         return;
     }
     // Ask for code
-    printf("Enter 3-digit code: ");
+    printf("Enter the 3 digit code: ");
     int guess;
     scanf("%d", &guess);
     getchar();
     if (guess == secretCode) {
-        printf("Click! The codebox opens!\n");
-        printf("You found a key! Use 'take key' to pick it up.\n");
+        printf("Click! It works, the codebox opens!\n");
+        printf("You found a key! Use 'take key' to pick it up\n");
         AddItemToRoom(room, codebox->hiddenItem);
         codebox->hiddenItem = NULL;
         codeboxOpened = 1;
     } else {
-        printf("Wrong code. The lock doesn't budge.\n");
+        printf("Wrong code. The lock doesn't open.\n");
     }
 }
-
+//Reads an item's description from inventory
 void ReadItem(Command cmd) {
     if (cmd.secondWord == NULL) {
         printf("Read what?\n");
@@ -319,9 +320,10 @@ void ReadItem(Command cmd) {
 
     printf("You don't have a %s.\n", cmd.secondWord);
 }
+//Prints my cli map I created using keyboard only
 void PrintMap(void) {
     printf("\n");
-    printf("      GROUND FLOOR                              UPSTAIRS\n");
+    printf("        GROUND FLOOR                            UPSTAIRS\n");
     printf("\n");
     printf("         [Exit Door]                             [Attic]        [Bathroom]\n");
     printf("              |                                    |              |\n");
@@ -331,11 +333,11 @@ void PrintMap(void) {
     printf("  (rat)       |           |         (drawer)       |\n");
     printf("            south         |                      down\n");
     printf("              |           |                        |\n");
-    printf("         [Basement]       | -----------------> (to Stairs)\n");
+    printf("         [Basement]        ----------------->  (to Stairs)\n");
     printf("        *START HERE\n");
     printf("\n");
 }
-
+//Actually proccesses the commands taken from player
 int ProcessCommand(Command cmd) {
 
     if (cmd.commandWord == NULL) {
@@ -359,7 +361,7 @@ int ProcessCommand(Command cmd) {
     } else if (strcmp(cmd.commandWord, "quit") == 0) {
         return 1;
     } else if (strcmp(cmd.commandWord, "debug") == 0) {
-        // Give all items
+        //Give all items
         player->inventory[player->inventoryCount] = CreateItem("rope", "debug rope");
         player->inventoryCount = player->inventoryCount + 1;
         player->inventory[player->inventoryCount] = CreateItem("key", "debug key");
@@ -422,7 +424,7 @@ int ProcessCommand(Command cmd) {
     }
     return 0;
 }
-
+//Runs the main game loop
 void Play(void) {
     PrintWelcome();
     int finished = 0;
