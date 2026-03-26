@@ -8,8 +8,8 @@
 //Prints starting message
 void PrintWelcome(void) {
     printf("\nWelcome to Escape It!\n");
-    printf("You awaken in darkness. Your head throbs. You must escape.\n");
-    printf("Type 'help' if you need help.\n\n"); //implementing this later
+    printf("You awaken in darkness. Your head hurts, you remembered that you got hold at gun point and blindfolded. You must escape, Quick!\n");
+    printf("Type 'help' if you need help with commands.\n\n"); //implementing this later
     PrintRoom(player->currentRoom);
 }
 //Moves the player in the direction they gave in cli
