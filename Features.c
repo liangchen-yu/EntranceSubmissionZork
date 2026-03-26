@@ -259,7 +259,9 @@ void LoadGame(void) {
     for (int i = 0; i < itemCount; i++) {
         char itemName[100];
         fscanf(file, "%s", itemName);
-        player->inventory[player->inventoryCount] = CreateItem(itemName, "loaded item");
+        char *savedName = malloc(100);
+        strcpy(savedName, itemName);
+        player->inventory[player->inventoryCount] = CreateItem(savedName, "loaded item");
         player->inventoryCount = player->inventoryCount + 1;
     }
     fscanf(file, "%d", &secretCode);

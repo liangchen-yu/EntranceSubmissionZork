@@ -152,16 +152,16 @@ void CreateRooms(void) {
     srand(time(NULL));
     secretCode = (rand() % 900) + 100;
     // Create all rooms
-    basement = CreateRoom("In the cold, damp basement. Water drips from the rusty pipes overhead");
-    hallway = CreateRoom("In the narrow, dark hallway");
-    garage = CreateRoom("In the dusty, old garage");
-    office = CreateRoom("In the messy, cluttered office");
-    bathroom = CreateRoom("in the grimy bathroom. The mirror is cracked and the faucet drips steadily");
-    bedroom = CreateRoom("In the bedroom. The bed sheets are stained and moth-eaten");
-    stairs = CreateRoom("on the creaky wooden stairs. Each step groans under your weight");
-    upstairs = CreateRoom("upstairs in the dim corridor. Moonlight filters through a broken window");
-    attic = CreateRoom("in the dark, suffocating attic. Cobwebs hang from every corner");
-    exitDoor = CreateRoom("at the exit");
+    basement = CreateRoom("You're in the cold, damp basement. Water drips from the rusty pipes overhead");
+    hallway = CreateRoom("You're in the narrow, dark hallway");
+    garage = CreateRoom("You're in the dusty, old garage");
+    office = CreateRoom("You're in the messy, cluttered office");
+    bathroom = CreateRoom("You're the grimy bathroom. The mirror is cracked and the faucet drips steadily");
+    bedroom = CreateRoom("You're the bedroom. The bed sheets are stained and moth-eaten");
+    stairs = CreateRoom("You're on the creaky wooden stairs. Each step groans under your weight");
+    upstairs = CreateRoom("You're upstairs. Moonlight filters through a broken window");
+    attic = CreateRoom("You're in the dark, suffocating attic. Cobwebs hang from every corner");
+    exitDoor = CreateRoom("You're at the exit");
 
     // Link rooms
     basement->north = hallway;
