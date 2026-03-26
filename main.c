@@ -270,14 +270,14 @@ NPC *CreateNPC(char *name, char *description, char *dialogue) {
     PlaceItemsRandomly();
 }
 */
-Player *CreatePlayer(char *name, Room *start) {
+/*Player *CreatePlayer(char *name, Room *start) {
     Player *p = (Player *)malloc(sizeof(Player));
     p->name = name;
     p->currentRoom = start;
     p->inventoryCount = 0;
     return p;
 }
-
+*/
 Command GetCommand(void) {
     Command cmd;
     cmd.commandWord = NULL;
@@ -299,14 +299,14 @@ Command GetCommand(void) {
     return cmd;
 }
 
-int HasItem(char *itemName) {
+/*int HasItem(char *itemName) {
     for (int i = 0; i < player->inventoryCount; i++) {
         if (strcmp(player->inventory[i]->name, itemName) == 0) {
             return 1;
         }
     }
     return 0;
-}
+}*/
 
 void GoRoom(Command cmd) {
     if (cmd.secondWord == NULL) {

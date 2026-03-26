@@ -7,4 +7,5 @@ add_executable(EntranceSubmissionZork main.c
         Item.h
         Item.c
         Declaration.h
-        Room.c)
+        Room.c
+        Player.c)
