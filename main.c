@@ -612,6 +612,22 @@ void ReadItem(Command cmd) {
 
     printf("You don't have a %s.\n", cmd.secondWord);
 }
+void PrintMap(void) {
+    printf("\n");
+    printf("      GROUND FLOOR                              UPSTAIRS\n");
+    printf("\n");
+    printf("         [Exit Door]                             [Attic]        [Bathroom]\n");
+    printf("              |                                    |              |\n");
+    printf("        north(need key)                        up(need rope)     north\n");
+    printf("              |                                    |               |\n");
+    printf("[Garage]--[Hallway]---[Stairs]      [Office]---[Upstairs]------[Bedroom]\n");
+    printf("  (rat)       |           |         (drawer)       |\n");
+    printf("            south         |                      down\n");
+    printf("              |           |                        |\n");
+    printf("         [Basement]       | -----------------> (to Stairs)\n");
+    printf("        *START HERE\n");
+    printf("\n");
+}
 
 int ProcessCommand(Command cmd) {
 
@@ -624,7 +640,7 @@ int ProcessCommand(Command cmd) {
     } else if (strcmp(cmd.commandWord, "look") == 0) {
         PrintRoom(player->currentRoom);
     } else if (strcmp(cmd.commandWord, "help") == 0) {
-        printf("Commands: go, look, take, drop, inventory, search, read, interact, open, save, load, debug, teleport, help, quit\n");
+        printf("Commands: go, look, take, drop, inventory, search, read, interact, open, save, load, debug, teleport, map, help, quit\n");
     } else if (strcmp(cmd.commandWord, "take") == 0) {
         TakeItem(cmd);
     } else if (strcmp(cmd.commandWord, "drop") == 0) {
@@ -688,6 +704,8 @@ int ProcessCommand(Command cmd) {
         OpenCodeBox();
     } else if (strcmp(cmd.commandWord, "read") == 0) {
         ReadItem(cmd);
+    } else if (strcmp(cmd.commandWord, "map") == 0) {
+        PrintMap();
     } else {
         printf("Unknown command\n");
     }
