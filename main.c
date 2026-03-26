@@ -32,6 +32,13 @@ typedef struct Room {
 
 typedef struct {
     char *name;
+    char *description;
+    char *dialogue;
+    Room *location;
+} NPC;
+
+typedef struct {
+    char *name;
     Room *currentRoom;
     Item *inventory[10];
     int inventoryCount;
@@ -42,10 +49,13 @@ typedef struct {
     char *secondWord;
 } Command;
 
+NPC *rat;
 Player *player;
-
 Room *basement, *hallway, *garage, *office, *bathroom, *bedroom, *stairs, *upstairs, *attic, *exitDoor;
 
+int secretCode;
+int codeboxOpened = 0;
+Furniture *codebox;
 char input[500];
 char word1[100];
 char word2[100];
@@ -78,8 +88,6 @@ void AddItemToRoom(Room *room, Item *item) {
 }
 
 void PlaceItemsRandomly(void) {
-    srand(time(NULL)); //simple random genertaor for spawning items in dif room
-
     int random1 = rand() % 7;
     int random2 = rand() % 7;
     int random3 = rand() % 7;
@@ -174,6 +182,9 @@ void PrintRoom(Room *room) {
     if (room->down) {
         printf("down\n");
     }
+    if (rat->location == room) {
+        printf("You see a %s here\n", rat->name);
+    }
 }
 
 void PrintWelcome(void) {
@@ -198,7 +209,18 @@ void AddFurnitureToRoom(Room *room, Furniture *furniture) {
     room->furnitureCount = room->furnitureCount + 1;
 }
 
+NPC *CreateNPC(char *name, char *description, char *dialogue) {
+    NPC *npc = (NPC *)malloc(sizeof(NPC));
+    npc->name = name;
+    npc->description = description;
+    npc->dialogue = dialogue;
+    npc->location = NULL;
+    return npc;
+}
+
 void CreateRooms(void) {
+    srand(time(NULL));
+    secretCode = (rand() % 900) + 100;
     // Create all rooms
     basement = CreateRoom("In the cold, damp basement. Water drips from the rusty pipes overhead");
     hallway = CreateRoom("In the narrow, dark hallway");
@@ -230,12 +252,20 @@ void CreateRooms(void) {
     upstairs->west = office;
     office->east = upstairs;
 
+    // Drawer with notebook and has code
     Furniture *drawer = CreateFurniture("drawer", "a rusted drawer attached to the desk");
-    drawer->hiddenItem = CreateItem("notebook", "a weathered leather notebook with a code inside");
+    char *notebookDesc = malloc(100);
+    sprintf(notebookDesc, "a weathered notebook. Inside it says: The code is %d", secretCode);
+    drawer->hiddenItem = CreateItem("notebook", notebookDesc);
     AddFurnitureToRoom(office, drawer);
+    // Closet up inattic
     Furniture *closet = CreateFurniture("closet", "a tall, dusty wooden closet");
-    closet->hiddenItem = CreateItem("key", "a rusty old key");
     AddFurnitureToRoom(attic, closet);
+    // Codebox inside closet
+    codebox = CreateFurniture("codebox", "a small metal box with a 3-digit lock");
+    codebox->hiddenItem = CreateItem("key", "a rusty old key");
+    rat = CreateNPC("rat", "a grey rat with beady eyes", "The closet upstairs.. squeak...something shiny, and the notebook has werid number in it!");
+    rat->location = garage;
     PlaceItemsRandomly();
 }
 
@@ -405,23 +435,184 @@ void SearchFurniture(Command cmd) {
                 printf("You already searched this.\n");
                 return;
             }
-
             // Check for hidden item
             if (furniture->hiddenItem != NULL) {
                 printf("You found a %s!\n", furniture->hiddenItem->name);
+                printf("Use 'take %s' to pick it up\n", furniture->hiddenItem->name);
                 AddItemToRoom(room, furniture->hiddenItem);
                 furniture->hiddenItem = NULL;
+            } else if (strcmp(furniture->name, "closet") == 0 && codeboxOpened == 0) {
+                printf("You found a codebox inside!\n");
+                AddFurnitureToRoom(room, codebox);
             } else {
-                printf("You find nothing useful.\n");
+                printf("You find nothing useful\n");
             }
-
             furniture->searched = 1;
             return;
         }
     }
-
     printf("There is no %s here.\n", cmd.secondWord);
 }
+
+void InteractNPC(Command cmd) {
+    if (cmd.secondWord == NULL) {
+        printf("Interact with what?\n");
+        return;
+    }
+    if (strcmp(cmd.secondWord, "rat") == 0 && rat->location == player->currentRoom) {
+        printf("The rat says: %s\n", rat->dialogue);
+    } else {
+        printf("There is no %s here.\n", cmd.secondWord);
+    }
+}
+
+char *GetRoomName(Room *room) {
+    if (room == basement) {
+        return "basement";
+    } else if (room == hallway) {
+        return "hallway";
+    } else if (room == garage) {
+        return "garage";
+    } else if (room == office) {
+        return "office";
+    } else if (room == bathroom) {
+        return "bathroom";
+    } else if (room == bedroom) {
+        return "bedroom";
+    } else if (room == stairs) {
+        return "stairs";
+    } else if (room == upstairs) {
+        return "upstairs";
+    } else if (room == attic) {
+        return "attic";
+    } else if (room == exitDoor) {
+        return "exit";
+    } else {
+        return "unknown";
+    }
+}
+
+Room *GetRoomByName(char *name) {
+    if (strcmp(name, "basement") == 0) {
+        return basement;
+    } else if (strcmp(name, "hallway") == 0) {
+        return hallway;
+    } else if (strcmp(name, "garage") == 0) {
+        return garage;
+    } else if (strcmp(name, "office") == 0) {
+        return office;
+    } else if (strcmp(name, "bathroom") == 0) {
+        return bathroom;
+    } else if (strcmp(name, "bedroom") == 0) {
+        return bedroom;
+    } else if (strcmp(name, "stairs") == 0) {
+        return stairs;
+    } else if (strcmp(name, "upstairs") == 0) {
+        return upstairs;
+    } else if (strcmp(name, "attic") == 0) {
+        return attic;
+    } else if (strcmp(name, "exit") == 0) {
+        return exitDoor;
+    } else {
+        return basement;
+    }
+}
+
+void SaveGame(void) {
+    FILE *file = fopen("savegame.txt", "w");
+    if (file == NULL) {
+        printf("Could not save game.\n");
+        return;
+    }// Save current room
+    fprintf(file, "%s\n", GetRoomName(player->currentRoom));
+    // Save inventory count
+    fprintf(file, "%d\n", player->inventoryCount);
+    // Sav each item
+    for (int i = 0; i < player->inventoryCount; i++) {
+        fprintf(file, "%s\n", player->inventory[i]->name);
+    }
+    fprintf(file, "%d\n", secretCode); // saves code aswell
+    fclose(file);
+    printf("Game saved!\n");
+}
+
+void LoadGame(void) {
+    FILE *file = fopen("savegame.txt", "r");
+    if (file == NULL) {
+        printf("No save file found.\n");
+        return;
+    }
+    char roomName[100];
+    int itemCount;
+    // Load current room
+    fscanf(file, "%s", roomName);
+    player->currentRoom = GetRoomByName(roomName);
+    // Load inventory count
+    fscanf(file, "%d", &itemCount);
+    // Load each item
+    player->inventoryCount = 0;
+    for (int i = 0; i < itemCount; i++) {
+        char itemName[100];
+        fscanf(file, "%s", itemName);
+        player->inventory[player->inventoryCount] = CreateItem(itemName, "loaded item");
+        player->inventoryCount = player->inventoryCount + 1;
+    }
+    fscanf(file, "%d", &secretCode);
+    fclose(file);
+    printf("Game loaded!\n");
+    PrintRoom(player->currentRoom);
+}
+
+void OpenCodeBox(void) {
+    Room *room = player->currentRoom;
+    // Check if codebox is in room
+    int found = 0;
+    for (int i = 0; i < room->furnitureCount; i++) {
+        if (strcmp(room->furniture[i]->name, "codebox") == 0) {
+            found = 1;
+        }
+    }
+    if (found == 0) {
+        printf("There is no codebox here.\n");
+        return;
+    }
+    if (codeboxOpened == 1) {
+        printf("The codebox is already open.\n");
+        return;
+    }
+    // Ask for code
+    printf("Enter 3-digit code: ");
+    int guess;
+    scanf("%d", &guess);
+    getchar();
+    if (guess == secretCode) {
+        printf("Click! The codebox opens!\n");
+        printf("You found a key! Use 'take key' to pick it up.\n");
+        AddItemToRoom(room, codebox->hiddenItem);
+        codebox->hiddenItem = NULL;
+        codeboxOpened = 1;
+    } else {
+        printf("Wrong code. The lock doesn't budge.\n");
+    }
+}
+
+void ReadItem(Command cmd) {
+    if (cmd.secondWord == NULL) {
+        printf("Read what?\n");
+        return;
+    }
+
+    // Check inventory for item
+    for (int i = 0; i < player->inventoryCount; i++) {
+        if (strcmp(player->inventory[i]->name, cmd.secondWord) == 0) {
+            printf("%s\n", player->inventory[i]->description);
+            return;
+        }
+    }
+
+    printf("You don't have a %s.\n", cmd.secondWord);
+}
+
 int ProcessCommand(Command cmd) {
 
     if (cmd.commandWord == NULL) {
@@ -433,7 +624,7 @@ int ProcessCommand(Command cmd) {
     } else if (strcmp(cmd.commandWord, "look") == 0) {
         PrintRoom(player->currentRoom);
     } else if (strcmp(cmd.commandWord, "help") == 0) {
-        printf("Commands: go, look, take, drop, inventory, search, help, quit\n");
+        printf("Commands: go, look, take, drop, inventory, search, read, interact, open, save, load, debug, teleport, help, quit\n");
     } else if (strcmp(cmd.commandWord, "take") == 0) {
         TakeItem(cmd);
     } else if (strcmp(cmd.commandWord, "drop") == 0) {
@@ -484,19 +675,27 @@ int ProcessCommand(Command cmd) {
         } else if (strcmp(cmd.secondWord, "exit") == 0) {
             player->currentRoom = exitDoor;
             PrintRoom(player->currentRoom);
-        }else {
+        } else {
             printf("Unkown room\n");
         }
+    } else if (strcmp(cmd.commandWord, "interact") == 0) {
+        InteractNPC(cmd);
+    } else if (strcmp(cmd.commandWord, "save") == 0) {
+        SaveGame();
+    } else if (strcmp(cmd.commandWord, "load") == 0) {
+        LoadGame();
+    } else if (strcmp(cmd.commandWord, "open") == 0) {
+        OpenCodeBox();
+    } else if (strcmp(cmd.commandWord, "read") == 0) {
+        ReadItem(cmd);
     } else {
-            printf("Unknown command.\n");
-
+        printf("Unknown command\n");
     }
     return 0;
 }
 
 void Play(void) {
     PrintWelcome();
-
     int finished = 0;
     while (!finished) {
         Command cmd = GetCommand();
