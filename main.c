@@ -61,7 +61,7 @@ char input[500];
 char word1[100];
 char word2[100];
 
-Room *CreateRoom(char *description) {
+/*Room *CreateRoom(char *description) {
     Room *room = (Room *)malloc(sizeof(Room));
     room->description = description;
     room->north = NULL;
@@ -74,7 +74,7 @@ Room *CreateRoom(char *description) {
     room->furnitureCount = 0;
     return room;
 }
-
+*/
 /*Item *CreateItem(char *name, char *description) {
     Item *item = (Item *)malloc(sizeof(Item));
     item->name = name;
@@ -82,13 +82,13 @@ Room *CreateRoom(char *description) {
     return item;
 }
 */
-void AddItemToRoom(Room *room, Item *item) {
+/*void AddItemToRoom(Room *room, Item *item) {
     int count = room->itemCount;
     room->items[count] = item;
     room->itemCount = room->itemCount + 1;
 }
-
-void PlaceItemsRandomly(void) {
+*/
+/*void PlaceItemsRandomly(void) {
     int random1 = rand() % 7;
     int random2 = rand() % 7;
     int random3 = rand() % 7;
@@ -144,8 +144,8 @@ void PlaceItemsRandomly(void) {
         AddItemToRoom(upstairs, CreateItem("note", "a torn piece of paper"));
     }
 }
-
-void PrintRoom(Room *room) {
+*/
+/*void PrintRoom(Room *room) {
     printf("Room description: %s\n", room->description);
 
     if (room->itemCount > 0) {
@@ -187,7 +187,7 @@ void PrintRoom(Room *room) {
         printf("You see a %s here\n", rat->name);
     }
 }
-
+*/
 void PrintWelcome(void) {
     printf("\nWelcome to Escape It!\n");
     printf("You awaken in darkness. Your head throbs. You must escape.\n");
@@ -195,7 +195,7 @@ void PrintWelcome(void) {
     PrintRoom(player->currentRoom);
 }
 
-Furniture *CreateFurniture(char *name, char *description) {
+/*Furniture *CreateFurniture(char *name, char *description) {
     Furniture *furniture = (Furniture *)malloc(sizeof(Furniture));
     furniture->name = name;
     furniture->description = description;
@@ -217,9 +217,9 @@ NPC *CreateNPC(char *name, char *description, char *dialogue) {
     npc->dialogue = dialogue;
     npc->location = NULL;
     return npc;
-}
+}*/
 
-void CreateRooms(void) {
+/*void CreateRooms(void) {
     srand(time(NULL));
     secretCode = (rand() % 900) + 100;
     // Create all rooms
@@ -269,7 +269,7 @@ void CreateRooms(void) {
     rat->location = garage;
     PlaceItemsRandomly();
 }
-
+*/
 Player *CreatePlayer(char *name, Room *start) {
     Player *p = (Player *)malloc(sizeof(Player));
     p->name = name;
