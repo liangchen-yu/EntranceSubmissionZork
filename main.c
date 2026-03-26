@@ -278,7 +278,7 @@ NPC *CreateNPC(char *name, char *description, char *dialogue) {
     return p;
 }
 */
-Command GetCommand(void) {
+/*Command GetCommand(void) {
     Command cmd;
     cmd.commandWord = NULL;
     cmd.secondWord = NULL;
@@ -298,7 +298,7 @@ Command GetCommand(void) {
 
     return cmd;
 }
-
+*/
 /*int HasItem(char *itemName) {
     for (int i = 0; i < player->inventoryCount; i++) {
         if (strcmp(player->inventory[i]->name, itemName) == 0) {
