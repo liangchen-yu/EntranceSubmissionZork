@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "Item.h"
+#include "Declaration.h"
 
 /*typedef struct {
     char *name;
     char *description;
 } Item;
-*/
+
 typedef struct {
     char *name;
     char *description;
@@ -49,7 +49,7 @@ typedef struct {
     char *commandWord;
     char *secondWord;
 } Command;
-
+*/
 NPC *rat;
 Player *player;
 Room *basement, *hallway, *garage, *office, *bathroom, *bedroom, *stairs, *upstairs, *attic, *exitDoor;
