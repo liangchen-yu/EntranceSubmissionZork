@@ -3,4 +3,6 @@ project(EntranceSubmissionZork C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(EntranceSubmissionZork main.c)
+add_executable(EntranceSubmissionZork main.c
+        Item.h
+        Item.c)

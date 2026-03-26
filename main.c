@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "Item.h"
 
-typedef struct {
+/*typedef struct {
     char *name;
     char *description;
 } Item;
-
+*/
 typedef struct {
     char *name;
     char *description;
@@ -74,13 +75,13 @@ Room *CreateRoom(char *description) {
     return room;
 }
 
-Item *CreateItem(char *name, char *description) {
+/*Item *CreateItem(char *name, char *description) {
     Item *item = (Item *)malloc(sizeof(Item));
     item->name = name;
     item->description = description;
     return item;
 }
-
+*/
 void AddItemToRoom(Room *room, Item *item) {
     int count = room->itemCount;
     room->items[count] = item;
